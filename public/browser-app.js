@@ -8,56 +8,36 @@ const imageInputDOM = document.querySelector('#image')
 const containerDOM = document.querySelector('.container')
 
 
-imageInputDOM.addEventListener('change', async(e)=>
-{
+imageInputDOM.addEventListener('change',async (e)=>{
+ const imageFile = e.target.files[0];
+ const formData = new FormData();
+ formData.append('image',imageFile)
+ try {
+  const {data:{image:{src}}} = await axios.post(`${url}/uploads`,formData,{
+   headers:{
+    'Content-Type':'multipart/form-data'
+   }
+  })
+  imageValue = src
+ } catch (error) {
+   imageValue = null
+  console.log(error);
+ }
+})
 
-  const imageFile = e.target.files[0];
-  console.log(e)
-  console.log(e.target)
-  const formData = new FormData()
-  formData.append('image', imageFile)
-  
-  try{
-    const {data: {img : {src }}} = await axios.post(`${url}/upload`, formData, 
-      {
-        headers:
-        {
-          'Content-Type':'multipart/form-data'
-        }
-      }
-    )
-
-    imageValue = src
-  }
-
-  catch(error)
-  {
-    console.log(error)
-    imageValue = null
-    
-  }
-
-});
-
-fileFormDOM.addEventListener('submit', async(e)=>
-
-{
-  e.preventDefault()
-
-  const nameValue = nameInputDOM.value;
-  const priceValue = priceInputDOM.value;
-
-  try{
-    const product = {name:nameValue, price:priceValue, image:imageValue};
-    await axios.post(url,product);
-    fetchProducts();
-  }
-
-  catch(error)
-  {
-    console.log(error)
-  }
-
+fileFormDOM.addEventListener('submit',async (e)=>{
+e.preventDefault()
+const nameValue = nameInputDOM.value;
+const priceValue = priceInputDOM.value;
+try {
+ 
+ const product = {name:nameValue,price:priceValue,image:imageValue}
+ 
+  await axios.post(url,product);
+  fetchProducts()
+} catch (error) {
+ console.log(error);
+}
 })
 
 async function fetchProducts()
